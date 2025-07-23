@@ -1,20 +1,41 @@
-import React, { useState } from 'react'
-import { useDispatch, useSelector} from 'react-redux';
-import { additem } from '../store/cartSlice';
-//import type { RootState } from '.././store/store'; // adjust the import path as needed
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { additem, addeditem } from "../store/cartSlice";
 
 const App = () => {
   const cart = useSelector((store) => store.cart.items);
-  const dispatch=useDispatch();
-  function handleadd(){
-    dispatch(additem("grapes"))
+  const added = useSelector((store) => store.cart.added);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const fetchAndAddItems = async () => {
+      const response = await fetch(
+        "https://jsonplaceholder.typicode.com/todos"
+      );
+      const data = await response.json();
+
+      dispatch(additem(data));
+    };
+
+    fetchAndAddItems();
+  }, [dispatch]);
+  function handleAdd(prop) {
+    dispatch(addeditem(prop));
   }
   return (
-    <div>
-      {cart.map((i)=><div>{i}</div>)}
-      <button onClick={handleadd}>Add Item</button>
+    <div className="flex">
+      {cart.map((i, idx) => (
+        <div key={idx}>
+          {i.title}
+          <button onClick={() => handleAdd(i.title)}>Add</button>
+        </div>
+      ))}
+      Added
+      {added.map((i, idx) => (
+        <div key={idx}>{i}</div>
+      ))}
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
